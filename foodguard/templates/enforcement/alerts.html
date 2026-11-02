@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Alerts | {{ block.super }}{% endblock %}
+{% block banner %}
+<section class="page-banner"><div class="fg-container"><div class="crumb"><a href="{% url 'home' %}">Home</a> / Area alerts</div><h1>Area alerts</h1><p>Raised automatically when a vendor's risk score becomes high.</p></div></section>
+{% endblock %}
+{% block content %}
+<div class="fg-card">
+    <table class="table fg-table">
+        <thead><tr><th>Vendor</th><th>Area</th><th>Risk at trigger</th><th>Status</th><th>Date</th><th>Functions</th></tr></thead>
+        <tbody>
+        {% for a in alerts %}
+        <tr>
+            <td><a href="{% url 'vendor_detail' a.vendor.pk %}" class="fw-semibold text-decoration-none">{{ a.vendor.shop_name }}</a></td>
+            <td>{{ a.area }}</td>
+            <td>{{ a.risk_score_at_trigger|floatformat:0 }}/100</td>
+            <td>{% if a.is_active %}<span class="pill pill-critical">Active</span>{% else %}<span class="pill pill-closed">Closed</span>{% endif %}</td>
+            <td>{{ a.created_at|date:"d M Y" }}</td>
+            <td>
+                {% if user.userprofile.role == 'authority' %}
+                    {% if a.is_active %}
+                    <form method="post" action="{% url 'alert_deactivate' a.pk %}" class="d-inline"
+                          onsubmit="return confirm('Do you really want to deactivate this alert? Citizens in this area will no longer see it.')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">Deactivate</button>
+                    </form>
+                    {% else %}
+                    <form method="post" action="{% url 'alert_reactivate' a.pk %}" class="d-inline"
+                          onsubmit="return confirm('Reactivate this alert? Citizens in this area will see it again.')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-fg btn-sm">Reactivate</button>
+                    </form>
+                    {% endif %}
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-muted py-4">No alerts.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
