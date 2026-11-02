@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Register | {{ block.super }}{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+    <div class="auth-side">
+        <h2>Join FoodGuard BD</h2>
+        <p>Create a free citizen account and help make food safer in your neighbourhood.</p>
+        <ul>
+            <li><i class="bi bi-check-circle-fill"></i> Report unsafe food in minutes</li>
+            <li><i class="bi bi-check-circle-fill"></i> Upload photo evidence</li>
+            <li><i class="bi bi-check-circle-fill"></i> See what authorities did about it</li>
+        </ul>
+    </div>
+    <div class="auth-form">
+        <h3>Create your account</h3>
+        <p class="text-muted mb-4">It only takes a minute.</p>
+        <form method="post">
+            {% csrf_token %}
+            {% include 'partials/form_fields.html' %}
+            <button type="submit" class="fg-btn fg-btn-green w-100 justify-content-center fg-btn-lg">Register</button>
+        </form>
+        <p class="text-center mt-4 mb-0 small">Already registered? <a href="{% url 'login' %}" class="fw-semibold">Login</a></p>
+    </div>
+</div>
+{% endblock %}
