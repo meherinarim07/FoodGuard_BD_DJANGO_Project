@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import Verification, FraudFlag
 
-# Register your models here.
+admin.site.register(Verification)
+admin.site.register(FraudFlag)
