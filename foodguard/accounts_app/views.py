@@ -41,3 +41,13 @@ def user_logout(request):
     if request.method == 'POST':
         logout(request)
     return redirect('home')
+
+def vendors(request):
+    v_list = Vendor.objects.all().order_by('-risk_score')
+    return render(request, 'accounts/vendors.html', {'vendors': v_list})
+
+
+def vendor_detail(request, pk):
+    vendor = get_object_or_404(Vendor, pk=pk)
+    reports = vendor.foodreport_set.all().order_by('-created_at')
+    return render(request, 'accounts/vendor_detail.html', {'vendor': vendor, 'reports': reports})

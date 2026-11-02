@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Vendors | {{ block.super }}{% endblock %}
+{% block banner %}
+<section class="page-banner"><div class="fg-container"><div class="crumb"><a href="{% url 'home' %}">Home</a> / Vendors</div><h1>Vendors</h1><p>Food shops ranked by risk score.</p></div></section>
+{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-end flex-wrap">
+    <div></div>
+    {% if user.userprofile.role == 'citizen' or user.userprofile.role == 'authority' %}<a href="{% url 'vendor_create' %}" class="btn btn-fg mb-3"><i class="bi bi-plus-lg"></i> Add vendor</a>{% endif %}
+</div>
+<div class="fg-card">
+    <table class="table fg-table">
+        <thead><tr><th>Shop</th><th>Category</th><th>Area</th><th>Risk</th><th>Reports</th><th>Functions</th></tr></thead>
+        <tbody>
+        {% for v in vendors %}
+        <tr>
+            <td><a href="{% url 'vendor_detail' v.pk %}" class="fw-semibold text-decoration-none">{{ v.shop_name }}</a><div class="text-muted small">{{ v.address }}</div></td>
+            <td>{{ v.category }}</td>
+            <td>{{ v.area }}</td>
+            <td style="min-width:140px"><div class="risk"><div style="width: {{ v.risk_score|floatformat:0 }}%"></div></div><span class="small text-muted">{{ v.risk_score|floatformat:0 }}/100</span></td>
+            <td>{{ v.foodreport_set.count }}</td>
+            <td>
+                <a href="{% url 'vendor_detail' v.pk %}" class="btn btn-outline-fg btn-sm">View</a>
+                {% if user.userprofile.role == 'authority' %}
+                <a href="{% url 'vendor_update' v.pk %}" class="btn btn-primary btn-sm">Edit</a>
+                <a href="{% url 'vendor_delete' v.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-muted py-4">No vendors yet.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

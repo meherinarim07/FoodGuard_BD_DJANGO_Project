@@ -12,3 +12,9 @@ class RegisterForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'phone', 'area', 'password1', 'password2']
+
+
+class VendorForm(forms.ModelForm):
+    class Meta:
+        model = Vendor
+        exclude = ['risk_score']
