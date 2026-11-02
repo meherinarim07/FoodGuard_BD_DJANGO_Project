@@ -172,3 +172,31 @@ def post_create(request):
     else:
         form = AwarenessPostForm()
     return render(request, 'reports/post_create.html', {'form': form})
+
+@login_required
+def post_update(request, pk):
+    post = get_object_or_404(AwarenessPost, pk=pk)
+    if post.author != request.user:
+        messages.error(request, 'You can edit only your own posts.')
+        return redirect('awareness')
+    if request.method == 'POST':
+        form = AwarenessPostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect('post_detail', pk=pk)
+    else:
+        form = AwarenessPostForm(instance=post)
+    return render(request, 'reports/post_update.html', {'form': form, 'post': post})
+
+
+@login_required
+def post_delete(request, pk):
+    post = get_object_or_404(AwarenessPost, pk=pk)
+    if post.author != request.user:
+        messages.error(request, 'You can delete only your own posts.')
+        return redirect('awareness')
+    if request.method == 'POST':
+        post.delete()
+        return redirect('awareness')
+    return render(request, 'reports/post_delete.html', {'post': post})
+

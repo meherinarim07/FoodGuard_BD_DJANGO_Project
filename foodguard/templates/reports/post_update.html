@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Edit awareness post | {{ block.super }}{% endblock %}
+{% block content %}
+<div class="form-card fg-card card-pad">
+    <h3 class="page-title"><i class="bi bi-pencil-square"></i> Edit awareness post</h3>
+    <p class="page-sub">Update your post.</p>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% include 'partials/form_fields.html' %}
+        <button type="submit" class="btn btn-fg">Submit</button>
+        <a href="{% url 'post_detail' post.pk %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
