@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Investigation {{ investigation.id }} | {{ block.super }}{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="fg-card card-pad mb-4">
+            <div class="d-flex justify-content-between flex-wrap gap-2">
+                <div>
+                    <h2 class="page-title">Investigation #{{ investigation.id }}</h2>
+                    <p class="text-muted mb-0">Report:
+                        <a href="{% url 'report_detail' investigation.report.pk %}" class="text-decoration-none">{{ investigation.report }}</a></p>
+                </div>
+                <div>
+                    <span class="pill pill-{{ investigation.priority }}">{{ investigation.get_priority_display }}</span>
+                    <span class="pill pill-{{ investigation.status }}">{{ investigation.get_status_display }}</span>
+                </div>
+            </div>
+            <hr>
+            <h6>Action taken</h6>
+            <p>{{ investigation.action_taken|default:"Nothing recorded yet."|linebreaksbr }}</p>
+            <p class="text-muted small mb-0">Officer: <b>{{ investigation.authority.username }}</b> &middot;
+                Opened {{ investigation.opened_at|date:"d M Y" }}
+                {% if investigation.closed_at %}&middot; Closed {{ investigation.closed_at|date:"d M Y" }}{% endif %}</p>
+        </div>
+
+        <div class="fg-card">
+            <div class="card-title-bar">
+                <span><i class="bi bi-paperclip"></i> Resolution proof</span>
+                <a href="{% url 'proof_create' investigation.pk %}" class="btn btn-outline-fg btn-sm">Upload proof</a>
+            </div>
+            <table class="table fg-table">
+                <thead><tr><th>File</th><th>Notes</th><th>Uploaded</th><th>Functions</th></tr></thead>
+                <tbody>
+                {% for p in proofs %}
+                <tr>
+                    <td><a href="{{ p.proof_file.url }}" target="_blank">Open file</a></td>
+                    <td>{{ p.notes|default:"-" }}</td>
+                    <td>{{ p.uploaded_at|date:"d M Y" }}</td>
+                    <td>
+                        <a href="{% url 'proof_update' p.pk %}" class="btn btn-primary btn-sm">Edit</a>
+                        <a href="{% url 'proof_delete' p.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-muted py-3">No proof uploaded.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="fg-card card-pad">
+            <h5 class="mb-3">Actions</h5>
+            <div class="d-grid gap-2">
+                <a href="{% url 'investigation_update' investigation.pk %}" class="btn btn-primary">Update investigation</a>
+                {% if investigation.status != 'closed' %}
+                <a href="{% url 'investigation_close' investigation.pk %}" class="btn btn-success">Close investigation</a>
+                {% endif %}
+                <a href="{% url 'investigations' %}" class="btn btn-outline-secondary">Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

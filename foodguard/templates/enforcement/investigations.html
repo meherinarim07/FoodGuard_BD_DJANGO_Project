@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Investigations | {{ block.super }}{% endblock %}
+{% block banner %}
+<section class="page-banner"><div class="fg-container"><div class="crumb"><a href="{% url 'home' %}">Home</a> / Investigations</div><h1>Investigations</h1><p>Verified reports are investigated by food-safety authorities.</p></div></section>
+{% endblock %}
+{% block content %}
+{% if waiting %}
+<div class="fg-card mb-4">
+    <div class="card-title-bar"><span><i class="bi bi-hourglass-split"></i> Verified reports waiting for investigation</span></div>
+    <table class="table fg-table">
+        <tbody>
+        {% for r in waiting %}
+        <tr>
+            <td class="fw-semibold">{{ r.food_item }}</td>
+            <td>{{ r.vendor.shop_name }}</td>
+            <td><span class="pill pill-{{ r.severity }}">{{ r.get_severity_display }}</span></td>
+            <td class="text-end"><a href="{% url 'investigation_create' r.pk %}" class="btn btn-warning btn-sm">Open investigation</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<div class="fg-card">
+    <table class="table fg-table">
+        <thead><tr><th>ID</th><th>Report</th><th>Authority</th><th>Priority</th><th>Status</th><th>Opened</th><th>Functions</th></tr></thead>
+        <tbody>
+        {% for i in investigations %}
+        <tr>
+            <th scope="row">{{ i.id }}</th>
+            <td>{{ i.report.food_item }}</td>
+            <td>{{ i.authority.username }}</td>
+            <td><span class="pill pill-{{ i.priority }}">{{ i.get_priority_display }}</span></td>
+            <td><span class="pill pill-{{ i.status }}">{{ i.get_status_display }}</span></td>
+            <td>{{ i.opened_at|date:"d M Y" }}</td>
+            <td><a href="{% url 'investigation_detail' i.pk %}" class="btn btn-outline-fg btn-sm">View</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-center text-muted py-4">No investigations yet.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -31,3 +31,19 @@ def alert_reactivate(request, pk):
             alert.save()
             messages.success(request, 'Alert reactivated.')
     return redirect('alerts')
+
+
+@role_required('authority')
+def investigations(request):
+    i_list = Investigation.objects.all().order_by('-opened_at')
+    # verified reports that nobody is investigating yet
+    waiting = FoodReport.objects.filter(status='verified', investigation__isnull=True)
+    return render(request, 'enforcement/investigations.html',
+                  {'investigations': i_list, 'waiting': waiting})
+
+
+@role_required('authority')
+def investigation_detail(request, pk):
+    inv = get_object_or_404(Investigation, pk=pk)
+    return render(request, 'enforcement/investigation_detail.html',
+                  {'investigation': inv, 'proofs': inv.resolutionproof_set.all()})
