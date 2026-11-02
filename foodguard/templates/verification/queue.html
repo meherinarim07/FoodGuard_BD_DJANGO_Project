@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Verification queue | {{ block.super }}{% endblock %}
+{% block banner %}
+<section class="page-banner"><div class="fg-container"><div class="crumb"><a href="{% url 'home' %}">Home</a> / Verification queue</div><h1>Verification queue</h1><p>Reports waiting for verifier opinions. Two approvals verify a report, two rejections reject it.</p></div></section>
+{% endblock %}
+{% block content %}
+<div class="fg-card">
+    <table class="table fg-table">
+        <thead><tr><th>ID</th><th>Food item</th><th>Vendor</th><th>Severity</th><th>Status</th><th>Functions</th></tr></thead>
+        <tbody>
+        {% for r in reports %}
+        <tr>
+            <th scope="row">{{ r.id }}</th>
+            <td class="fw-semibold">{{ r.food_item }}</td>
+            <td>{{ r.vendor.shop_name }}</td>
+            <td><span class="pill pill-{{ r.severity }}">{{ r.get_severity_display }}</span></td>
+            <td><span class="pill pill-{{ r.status }}">{{ r.get_status_display }}</span></td>
+            <td>
+                <a href="{% url 'report_detail' r.pk %}" class="btn btn-outline-fg btn-sm">View</a>
+                {% if r.pk in done %}
+                <span class="text-muted small ms-1">Already verified</span>
+                {% else %}
+                <a href="{% url 'verification_create' r.pk %}" class="btn btn-fg btn-sm">Verify</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-muted py-4">Nothing to verify right now.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
