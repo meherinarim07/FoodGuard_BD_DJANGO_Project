@@ -67,3 +67,84 @@ def report_create(request):
     else:
         form = FoodReportForm()
     return render(request, 'reports/report_create.html', {'form': form})
+
+
+@login_required
+def report_update(request, pk):
+    report = get_object_or_404(FoodReport, pk=pk)
+    if report.reporter != request.user or report.status != 'pending':
+        messages.error(request, 'Only the reporter can edit a report, and only while it is pending.')
+        return redirect('report_detail', pk=pk)
+    if request.method == 'POST':
+        form = FoodReportForm(request.POST, instance=report)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Report updated.')
+            return redirect('report_detail', pk=pk)
+    else:
+        form = FoodReportForm(instance=report)
+    return render(request, 'reports/report_update.html', {'form': form, 'report': report})
+
+
+@login_required
+def report_delete(request, pk):
+    report = get_object_or_404(FoodReport, pk=pk)
+    if report.reporter != request.user or report.status != 'pending':
+        messages.error(request, 'Only the reporter can delete a report, and only while it is pending.')
+        return redirect('report_detail', pk=pk)
+    if request.method == 'POST':
+        vendor = report.vendor
+        report.delete()
+        vendor.calculate_risk_score()
+        messages.success(request, 'Report deleted.')
+        return redirect('my_reports')
+    return render(request, 'reports/report_delete.html', {'report': report})
+
+
+# ---------- Evidence ----------
+@login_required
+def evidence_create(request, pk):
+    report = get_object_or_404(FoodReport, pk=pk)
+    if report.reporter != request.user:
+        messages.error(request, 'Only the reporter can add evidence to this report.')
+        return redirect('report_detail', pk=pk)
+    if request.method == 'POST':
+        form = EvidenceForm(request.POST, request.FILES)
+        if form.is_valid():
+            evidence = form.save(commit=False)
+            evidence.report = report
+            evidence.save()
+            messages.success(request, 'Evidence uploaded.')
+            return redirect('report_detail', pk=report.pk)
+    else:
+        form = EvidenceForm()
+    return render(request, 'reports/evidence_create.html', {'form': form, 'report': report})
+
+
+@login_required
+def evidence_update(request, pk):
+    evidence = get_object_or_404(Evidence, pk=pk)
+    if evidence.report.reporter != request.user:
+        messages.error(request, 'Only the reporter can edit this evidence.')
+        return redirect('report_detail', pk=evidence.report.pk)
+    if request.method == 'POST':
+        form = EvidenceForm(request.POST, request.FILES, instance=evidence)
+        if form.is_valid():
+            form.save()
+            return redirect('report_detail', pk=evidence.report.pk)
+    else:
+        form = EvidenceForm(instance=evidence)
+    return render(request, 'reports/evidence_update.html', {'form': form, 'evidence': evidence})
+
+
+@login_required
+def evidence_delete(request, pk):
+    evidence = get_object_or_404(Evidence, pk=pk)
+    report_pk = evidence.report.pk
+    if evidence.report.reporter != request.user:
+        messages.error(request, 'Only the reporter can delete this evidence.')
+        return redirect('report_detail', pk=report_pk)
+    if request.method == 'POST':
+        evidence.delete()
+        return redirect('report_detail', pk=report_pk)
+    return render(request, 'reports/evidence_delete.html', {'evidence': evidence})

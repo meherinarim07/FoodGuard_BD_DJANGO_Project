@@ -6,4 +6,10 @@ urlpatterns = [
     path('my_reports', views.my_reports, name='my_reports'),
     path('report/<int:pk>', views.report_detail, name='report_detail'),
     path('report_create', views.report_create, name='report_create'),
+    path('report/<int:pk>/update', views.report_update, name='report_update'),
+    path('report/<int:pk>/delete', views.report_delete, name='report_delete'),
+
+    path('report/<int:pk>/evidence', views.evidence_create, name='evidence_create'),
+    path('evidence/<int:pk>/update', views.evidence_update, name='evidence_update'),
+    path('evidence/<int:pk>/delete', views.evidence_delete, name='evidence_delete'),
 ]
