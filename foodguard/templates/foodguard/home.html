@@ -1,4 +1,164 @@
 {% extends 'base.html' %}
-{% block content %}
-<h1>home page coming soon!</h1>
-{% endblock %}
+{% block title %}FoodGuard BD | Report unsafe food, protect your community{% endblock %}
+{% block main %}
+{% if messages %}
+<div class="fg-container pt-3">
+{% for message in messages %}<div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show mb-0 mt-2" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>{% endfor %}
+</div>
+{% endif %}
+{% if my_alerts %}
+<div class="fg-container">
+    <div class="alert-banner">
+        <b><i class="bi bi-exclamation-triangle-fill text-danger"></i> Alert in your area:</b>
+        {% for a in my_alerts %}
+            <a href="{% url 'vendor_detail' a.vendor.pk %}">{{ a.vendor.shop_name }}</a> (risk {{ a.risk_score_at_trigger|floatformat:0 }}){% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- HERO -->
+<section class="fg-hero" style="margin-top: {% if my_alerts %}1.5rem{% else %}0{% endif %}">
+    <div class="fg-container">
+        <div>
+            <span class="fg-chip"><i class="bi bi-patch-check-fill"></i> Trusted by citizens, verifiers and authorities</span>
+            <h1>Safe food starts with <em>your report</em></h1>
+            <p class="lead">Found spoiled, expired or unhygienic food? Report it in two minutes. Independent verifiers check every complaint and food-safety authorities act on it.</p>
+            <div class="fg-hero-actions">
+                {% if user.userprofile.role == 'verifier' %}
+                <a href="{% url 'verification_queue' %}" class="fg-btn fg-btn-accent fg-btn-lg"><i class="bi bi-patch-check-fill"></i> Open verification queue</a>
+                {% elif user.userprofile.role == 'authority' %}
+                <a href="{% url 'investigations' %}" class="fg-btn fg-btn-accent fg-btn-lg"><i class="bi bi-clipboard-check"></i> Open investigations</a>
+                {% else %}
+                <a href="{% url 'report_create' %}" class="fg-btn fg-btn-accent fg-btn-lg"><i class="bi bi-flag-fill"></i> Report a problem</a>
+                {% endif %}
+                <a href="{% url 'reports' %}" class="fg-btn fg-btn-outline fg-btn-lg">Browse reports</a>
+            </div>
+            <div class="fg-hero-trust">
+                <div><i class="bi bi-check-circle-fill text-success"></i> Free for citizens</div>
+                <div><i class="bi bi-check-circle-fill text-success"></i> Photo evidence</div>
+                <div><i class="bi bi-check-circle-fill text-success"></i> Checked by real people</div>
+            </div>
+        </div>
+        <div class="fg-hero-art">
+            <svg viewBox="0 0 540 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Food report illustration">
+                <circle cx="285" cy="235" r="205" fill="#d3e9dc"/>
+                <circle cx="470" cy="70" r="40" fill="#ffe2bd"/>
+                <circle cx="70" cy="390" r="26" fill="#ffe2bd"/>
+                <circle cx="500" cy="300" r="10" fill="#17794f" opacity=".35"/>
+                <circle cx="40" cy="190" r="8" fill="#f28c28" opacity=".6"/>
+
+                <!-- report card -->
+                <rect x="186" y="66" width="250" height="330" rx="22" fill="#0a2f20" opacity=".12"/>
+                <rect x="176" y="52" width="250" height="330" rx="22" fill="#ffffff" stroke="#cfe3d8" stroke-width="2"/>
+                <path d="M176 74 a22 22 0 0 1 22 -22 h206 a22 22 0 0 1 22 22 v44 h-250 z" fill="#0e5a3a"/>
+                <circle cx="206" cy="86" r="14" fill="#ffffff" opacity=".18"/>
+                <path d="M199 86 l5 5 l10 -11" stroke="#ffffff" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <text x="228" y="92" font-family="Poppins, Segoe UI, sans-serif" font-size="17" font-weight="600" fill="#ffffff">New food report</text>
+
+                <rect x="196" y="140" width="210" height="46" rx="10" fill="#f3f8f5"/>
+                <circle cx="220" cy="163" r="12" fill="#f28c28"/>
+                <rect x="241" y="153" width="90" height="8" rx="4" fill="#b8c9c0"/>
+                <rect x="241" y="168" width="60" height="7" rx="3.5" fill="#d3ded8"/>
+                <rect x="352" y="154" width="42" height="18" rx="9" fill="#ffe8d1"/>
+
+                <rect x="196" y="198" width="210" height="46" rx="10" fill="#f3f8f5"/>
+                <circle cx="220" cy="221" r="12" fill="#2e9b63"/>
+                <rect x="241" y="211" width="80" height="8" rx="4" fill="#b8c9c0"/>
+                <rect x="241" y="226" width="100" height="7" rx="3.5" fill="#d3ded8"/>
+                <rect x="352" y="212" width="42" height="18" rx="9" fill="#dcf5e8"/>
+
+                <rect x="196" y="256" width="210" height="46" rx="10" fill="#f3f8f5"/>
+                <circle cx="220" cy="279" r="12" fill="#e5484d"/>
+                <rect x="241" y="269" width="96" height="8" rx="4" fill="#b8c9c0"/>
+                <rect x="241" y="284" width="54" height="7" rx="3.5" fill="#d3ded8"/>
+                <rect x="352" y="270" width="42" height="18" rx="9" fill="#fde2e2"/>
+
+                <rect x="196" y="322" width="210" height="40" rx="10" fill="#f28c28"/>
+                <text x="301" y="347" text-anchor="middle" font-family="Poppins, Segoe UI, sans-serif" font-size="15" font-weight="600" fill="#ffffff">Submit report</text>
+
+                <!-- floating chips -->
+                <rect x="48" y="118" width="148" height="46" rx="23" fill="#ffffff" stroke="#cfe3d8" stroke-width="2"/>
+                <circle cx="74" cy="141" r="13" fill="#17794f"/>
+                <path d="M68 141 l5 5 l9 -10" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <text x="96" y="146" font-family="Inter, Segoe UI, sans-serif" font-size="15" font-weight="600" fill="#0a2f20">Verified</text>
+
+                <rect x="368" y="196" width="150" height="46" rx="23" fill="#ffffff" stroke="#ffd9a8" stroke-width="2"/>
+                <circle cx="394" cy="219" r="13" fill="#f28c28"/>
+                <path d="M394 211 v9 M394 225 v1" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/>
+                <text x="416" y="224" font-family="Inter, Segoe UI, sans-serif" font-size="15" font-weight="600" fill="#0a2f20">Area alert</text>
+
+                <!-- shield badge -->
+                <g transform="translate(118 330)">
+                    <path d="M0 -62 L54 -42 V10 C54 46 26 70 0 82 C-26 70 -54 46 -54 10 V-42 Z" fill="#17794f" stroke="#ffffff" stroke-width="7"/>
+                    <path d="M-22 6 L-6 22 L24 -16" stroke="#ffffff" stroke-width="11" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </g>
+
+                <!-- plate -->
+                <circle cx="474" cy="372" r="56" fill="#ffffff" stroke="#cfe3d8" stroke-width="5"/>
+                <circle cx="474" cy="372" r="38" fill="#f3f8f5" stroke="#e1ece6" stroke-width="3"/>
+                <circle cx="462" cy="364" r="13" fill="#f28c28"/>
+                <circle cx="487" cy="380" r="11" fill="#2e9b63"/>
+                <circle cx="467" cy="388" r="7" fill="#e5484d"/>
+            </svg>
+        </div>
+    </div>
+</section>
+
+<!-- STATS -->
+<section class="fg-stats">
+    <div class="fg-container">
+        <div class="fg-stat"><i class="bi bi-clipboard2-pulse"></i><b>{{ total_reports }}</b><span>Total reports</span></div>
+        <div class="fg-stat"><i class="bi bi-patch-check"></i><b>{{ verified_reports }}</b><span>Verified reports</span></div>
+        <div class="fg-stat"><i class="bi bi-shop"></i><b>{{ total_vendors }}</b><span>Vendors tracked</span></div>
+        <div class="fg-stat"><i class="bi bi-bell"></i><b>{{ active_alerts }}</b><span>Active area alerts</span></div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="fg-section">
+    <div class="fg-container">
+        <div class="fg-head">
+            <span class="fg-eyebrow">How it works</span>
+            <h2>From complaint to action in four steps</h2>
+            <p>Every report follows the same transparent journey, so nothing gets lost.</p>
+        </div>
+        <div class="fg-grid fg-grid-4">
+            <div class="fg-step"><div class="fg-step-icon"><i class="bi bi-camera"></i><span class="fg-step-num">1</span></div><h4>Report</h4><p>Choose the vendor, describe the problem and upload a photo as evidence.</p></div>
+            <div class="fg-step"><div class="fg-step-icon"><i class="bi bi-person-check"></i><span class="fg-step-num">2</span></div><h4>Verify</h4><p>Independent verifiers review the evidence and give an honest verdict.</p></div>
+            <div class="fg-step"><div class="fg-step-icon"><i class="bi bi-shield-exclamation"></i><span class="fg-step-num">3</span></div><h4>Protect</h4><p>Fraud is flagged, vendor risk is scored and area alerts go out automatically.</p></div>
+            <div class="fg-step"><div class="fg-step-icon"><i class="bi bi-clipboard-check"></i><span class="fg-step-num">4</span></div><h4>Resolve</h4><p>Authorities investigate, take action and upload proof that it was fixed.</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- ROLES -->
+<section class="fg-section alt">
+    <div class="fg-container">
+        <div class="fg-head">
+            <span class="fg-eyebrow">Who uses FoodGuard</span>
+            <h2>One platform, three roles</h2>
+            <p>Everyone has a clear job, which keeps the system fair and trustworthy.</p>
+        </div>
+        <div class="fg-grid fg-grid-3">
+            <div class="fg-role">
+                <div class="ic"><i class="bi bi-people"></i></div>
+                <h4>Citizens</h4>
+                <p>Anyone can speak up when food is unsafe.</p>
+                <ul><li>Report a vendor and food item</li><li>Upload photo evidence</li><li>Track report status and trust score</li></ul>
+            </div>
+            <div class="fg-role r2">
+                <div class="ic" style="background:#fff0de;color:#d9741a"><i class="bi bi-search"></i></div>
+                <h4>Verifiers</h4>
+                <p>Trusted reviewers who check the facts.</p>
+                <ul><li>Review pending reports and evidence</li><li>Rate confidence and evidence quality</li><li>Two opinions decide the result</li></ul>
+            </div>
+            <div class="fg-role r3">
+                <div class="ic" style="background:#e3eefa;color:#2f6fb0"><i class="bi bi-building-check"></i></div>
+                <h4>Authorities</h4>
+                <p>Officers who take real action.</p>
+                <ul><li>Investigate verified reports</li><li>Upload proof of resolution</li><li>Handle fraud flags and area alerts</li></ul>
+            </div>
+        </div>
+    </div>
+</section>
