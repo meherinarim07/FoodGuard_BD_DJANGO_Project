@@ -47,3 +47,38 @@ def investigation_detail(request, pk):
     inv = get_object_or_404(Investigation, pk=pk)
     return render(request, 'enforcement/investigation_detail.html',
                   {'investigation': inv, 'proofs': inv.resolutionproof_set.all()})
+
+@role_required('authority')
+def investigation_create(request, pk):
+    report = get_object_or_404(FoodReport, pk=pk)
+    if report.status != 'verified':
+        messages.error(request, 'Only a verified report can be investigated.')
+        return redirect('investigations')
+    if Investigation.objects.filter(report=report).exists():
+        messages.error(request, 'This report already has an investigation.')
+        return redirect('investigations')
+    if request.method == 'POST':
+        form = InvestigationForm(request.POST)
+        if form.is_valid():
+            inv = form.save(commit=False)
+            inv.report = report
+            inv.authority = request.user
+            inv.save()
+            messages.success(request, 'Investigation opened.')
+            return redirect('investigation_detail', pk=inv.pk)
+    else:
+        form = InvestigationForm()
+    return render(request, 'enforcement/investigation_create.html', {'form': form, 'report': report})
+
+
+@role_required('authority')
+def investigation_update(request, pk):
+    inv = get_object_or_404(Investigation, pk=pk)
+    if request.method == 'POST':
+        form = InvestigationForm(request.POST, instance=inv)
+        if form.is_valid():
+            form.save()
+            return redirect('investigation_detail', pk=pk)
+    else:
+        form = InvestigationForm(instance=inv)
+    return render(request, 'enforcement/investigation_update.html', {'form': form, 'investigation': inv})

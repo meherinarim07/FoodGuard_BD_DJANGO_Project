@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Open investigation | {{ block.super }}{% endblock %}
+{% block content %}
+<div class="form-card fg-card card-pad">
+    <h3 class="page-title"><i class="bi bi-search"></i> Open investigation</h3>
+    <p class="page-sub">Only one investigation can exist for a report.</p>
+    <p class="small text-muted">Report: <b>{{ report }}</b></p>
+    <form method="post">
+        {% csrf_token %}
+        {% include 'partials/form_fields.html' %}
+        <button type="submit" class="btn btn-fg">Submit</button>
+        <a href="{% url 'investigations' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
