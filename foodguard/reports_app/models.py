@@ -53,16 +53,12 @@ class FoodReport(models.Model):
 
 
     def submit(self):
-        # called once when a citizen sends a new report.
-        # The report starts as pending and does not change the vendor risk yet.
         from verification_app.models import FraudFlag
         self.status = 'pending'
         self.save()
         FraudFlag.evaluate(self)
 
     def update_status(self, new_status=None):
-        # with a value: set it directly (authority use)
-        # without a value: decide from the verifier votes (2 approvals = verified, 2 rejections = rejected)
         if new_status:
             self.status = new_status
         else:
@@ -82,7 +78,6 @@ class FoodReport(models.Model):
         self.vendor.check_alert()
 
     def get_chain(self):
-        # the full life of a report: report -> verifications -> investigation
         try:
             investigation = self.investigation
         except Exception:
