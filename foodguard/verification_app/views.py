@@ -16,3 +16,30 @@ def verification_queue(request):
     q_list = sorted(q_list, key=lambda r: rank[r.severity])
     done = Verification.objects.filter(verifier=request.user).values_list('report_id', flat=True)
     return render(request, 'verification/queue.html', {'reports': q_list, 'done': list(done)})
+
+@role_required('verifier')
+def verification_create(request, pk):
+    report = get_object_or_404(FoodReport, pk=pk)
+    if report.status not in ['pending', 'under_review']:
+        messages.error(request, 'This report is already closed for verification.')
+        return redirect('verification_queue')
+    if report.reporter == request.user:
+        messages.error(request, 'You cannot verify your own report.')
+        return redirect('verification_queue')
+    if Verification.objects.filter(report=report, verifier=request.user).exists():
+        messages.error(request, 'You have already verified this report.')
+        return redirect('verification_queue')
+    if request.method == 'POST':
+        form = VerificationForm(request.POST)
+        if form.is_valid():
+            v = form.save(commit=False)
+            v.report = report
+            v.verifier = request.user
+            v.save()
+            report.update_status()
+            messages.success(request, 'Your verification was saved.')
+            return redirect('verification_queue')
+    else:
+        form = VerificationForm()
+    return render(request, 'verification/verification_create.html', {
+        'form': form, 'report': report, 'evidence_list': report.evidence_set.all()})

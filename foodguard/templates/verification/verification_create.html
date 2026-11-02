@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Verify report | {{ block.super }}{% endblock %}
+{% block content %}
+<div class="form-card fg-card card-pad">
+    <h3 class="page-title"><i class="bi bi-patch-check"></i> Verify report</h3>
+    <p class="page-sub">Give your honest opinion. You can verify each report only once.</p>
+    <div class="alert alert-light border">
+        <b>{{ report.food_item }}</b> &middot; {{ report.vendor.shop_name }}
+        <span class="pill pill-{{ report.severity }} ms-2">{{ report.get_severity_display }}</span>
+        <p class="small mb-2 mt-2">{{ report.description }}</p>
+        {% for e in evidence_list %}<a href="{{ e.image.url }}" target="_blank"><img src="{{ e.image.url }}" height="70" class="rounded me-1" alt="Evidence"></a>{% endfor %}
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        {% include 'partials/form_fields.html' %}
+        <button type="submit" class="btn btn-fg">Submit</button>
+        <a href="{% url 'verification_queue' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
