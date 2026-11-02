@@ -96,5 +96,15 @@ class FoodReport(models.Model):
     def __str__(self):
         return f"{self.food_item} @ {self.vendor.shop_name}"
 
+class Evidence(models.Model):
+    report = models.ForeignKey(FoodReport, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='evidence/')
+    caption = models.CharField(max_length=150, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Evidence for report {self.report_id}"
+
+
 
 
