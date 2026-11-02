@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Upload resolution proof | {{ block.super }}{% endblock %}
+{% block content %}
+<div class="form-card fg-card card-pad">
+    <h3 class="page-title"><i class="bi bi-paperclip"></i> Upload resolution proof</h3>
+    <p class="page-sub">Photo, PDF or any document that shows the problem was fixed.</p>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% include 'partials/form_fields.html' %}
+        <button type="submit" class="btn btn-fg">Submit</button>
+        <a href="{% url 'investigation_detail' investigation.pk %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

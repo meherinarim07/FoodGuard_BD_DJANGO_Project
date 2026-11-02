@@ -91,3 +91,18 @@ def investigation_close(request, pk):
         messages.success(request, 'Investigation closed and the report is marked resolved.')
         return redirect('investigation_detail', pk=pk)
     return render(request, 'enforcement/investigation_close.html', {'investigation': inv})
+
+@role_required('authority')
+def proof_create(request, pk):
+    inv = get_object_or_404(Investigation, pk=pk)
+    if request.method == 'POST':
+        form = ResolutionProofForm(request.POST, request.FILES)
+        if form.is_valid():
+            proof = form.save(commit=False)
+            proof.investigation = inv
+            proof.save()
+            messages.success(request, 'Proof uploaded.')
+            return redirect('investigation_detail', pk=inv.pk)
+    else:
+        form = ResolutionProofForm()
+    return render(request, 'enforcement/proof_create.html', {'form': form, 'investigation': inv})
