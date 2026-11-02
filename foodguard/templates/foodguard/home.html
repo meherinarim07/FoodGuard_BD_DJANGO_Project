@@ -162,3 +162,44 @@
         </div>
     </div>
 </section>
+<!-- AWARENESS -->
+<section class="fg-section">
+    <div class="fg-container">
+        <div class="fg-head-row">
+            <div><span class="fg-eyebrow">Learn &amp; stay safe</span><h2>Food safety awareness</h2></div>
+            <a href="{% url 'awareness' %}" class="fg-btn fg-btn-outline fg-btn-sm">More articles <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="fg-grid fg-grid-3">
+            {% for p in posts %}
+            <article class="fg-post">
+                {% if p.image %}<img src="{{ p.image.url }}" alt="{{ p.title }}">{% else %}<div class="ph"><i class="bi bi-egg-fried"></i></div>{% endif %}
+                <div class="body">
+                    <span class="tag">{{ p.category }}</span>
+                    <h5>{{ p.title }}</h5>
+                    <p>{{ p.content|truncatechars:100 }}</p>
+                    <div class="meta"><a href="{% url 'post_detail' p.pk %}" class="fw-semibold text-decoration-none">Read more &rarr;</a><span><i class="bi bi-eye"></i> {{ p.views_count }}</span></div>
+                </div>
+            </article>
+            {% empty %}
+            <p class="text-muted">No awareness posts yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% if not user.is_authenticated %}
+<!-- CTA -->
+<section class="fg-cta">
+    <div class="fg-container">
+        <div>
+            <h2>Saw something unsafe? Don't stay silent.</h2>
+            <p>One report can protect hundreds of families in your area.</p>
+        </div>
+        <div class="fg-hero-actions">
+            <a href="{% url 'register' %}" class="fg-btn fg-btn-accent fg-btn-lg"><i class="bi bi-person-plus"></i> Create free account</a>
+            <a href="{% url 'login' %}" class="fg-btn fg-btn-ghost fg-btn-lg">Login</a>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
