@@ -17,8 +17,9 @@
 </div>
 {% endif %}
 
+
 <!-- HERO -->
-<section class="fg-hero" style="margin-top: {% if my_alerts %}1.5rem{% else %}0{% endif %}">
+<section class="fg-hero{% if my_alerts %} has-alerts{% endif %}">
     <div class="fg-container">
         <div>
             <span class="fg-chip"><i class="bi bi-patch-check-fill"></i> Trusted by citizens, verifiers and authorities</span>
