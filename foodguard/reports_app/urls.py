@@ -15,5 +15,6 @@ urlpatterns = [
 
     path('awareness', views.awareness, name='awareness'),
     path('post/<int:pk>', views.post_detail, name='post_detail'),
+    path('post_create', views.post_create, name='post_create'),
 
 ]

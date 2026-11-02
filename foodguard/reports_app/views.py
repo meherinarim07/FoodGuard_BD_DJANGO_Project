@@ -158,3 +158,17 @@ def post_detail(request, pk):
     post = get_object_or_404(AwarenessPost, pk=pk)
     post.increment_views()
     return render(request, 'reports/post_detail.html', {'post': post})
+
+@login_required
+def post_create(request):
+    if request.method == 'POST':
+        form = AwarenessPostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.publish()
+            messages.success(request, 'Awareness post published.')
+            return redirect('awareness')
+    else:
+        form = AwarenessPostForm()
+    return render(request, 'reports/post_create.html', {'form': form})
