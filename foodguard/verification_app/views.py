@@ -17,6 +17,12 @@ def verification_queue(request):
     done = Verification.objects.filter(verifier=request.user).values_list('report_id', flat=True)
     return render(request, 'verification/queue.html', {'reports': q_list, 'done': list(done)})
 
+
+@role_required('verifier')
+def verifications(request):
+    v_list = Verification.objects.filter(verifier=request.user).order_by('-created_at')
+    return render(request, 'verification/verifications.html', {'verifications': v_list})
+
 @role_required('verifier')
 def verification_create(request, pk):
     report = get_object_or_404(FoodReport, pk=pk)

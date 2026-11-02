@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}My verifications | {{ block.super }}{% endblock %}
+{% block banner %}
+<section class="page-banner"><div class="fg-container"><div class="crumb"><a href="{% url 'home' %}">Home</a> / My verifications</div><h1>My verifications</h1><p>Opinions you have given.</p></div></section>
+{% endblock %}
+{% block content %}
+<div class="fg-card">
+    <table class="table fg-table">
+        <thead><tr><th>Report</th><th>Verdict</th><th>Confidence</th><th>Evidence quality</th><th>Date</th><th>Functions</th></tr></thead>
+        <tbody>
+        {% for v in verifications %}
+        <tr>
+            <td><a href="{% url 'report_detail' v.report.pk %}" class="text-decoration-none fw-semibold">{{ v.report.food_item }}</a></td>
+            <td><span class="pill pill-{{ v.verdict }}">{{ v.get_verdict_display }}</span></td>
+            <td>{{ v.confidence }}/5</td>
+            <td>{{ v.evidence_quality }}/5</td>
+            <td>{{ v.created_at|date:"d M Y" }}</td>
+            <td>
+                <a href="{% url 'verification_update' v.pk %}" class="btn btn-primary btn-sm">Edit</a>
+                <a href="{% url 'verification_delete' v.pk %}" class="btn btn-danger btn-sm">Delete</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-muted py-4">You have not verified any report yet.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
