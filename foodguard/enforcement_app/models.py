@@ -59,3 +59,13 @@ class Investigation(models.Model):
 
     def __str__(self):
         return f"Investigation of report {self.report_id} ({self.status})"
+
+
+class ResolutionProof(models.Model):
+    investigation = models.ForeignKey(Investigation, on_delete=models.CASCADE)
+    proof_file = models.FileField(upload_to='proofs/')
+    notes = models.TextField(blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Proof for investigation {self.investigation_id}"
