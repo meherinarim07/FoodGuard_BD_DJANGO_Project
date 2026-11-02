@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Vendor
-from .forms import RegisterForm
+from .forms import RegisterForm,VendorForm
 from .decorators import role_required
 
 
@@ -51,3 +51,18 @@ def vendor_detail(request, pk):
     vendor = get_object_or_404(Vendor, pk=pk)
     reports = vendor.foodreport_set.all().order_by('-created_at')
     return render(request, 'accounts/vendor_detail.html', {'vendor': vendor, 'reports': reports})
+
+@role_required('citizen', 'authority')
+def vendor_create(request):
+    if request.method == 'POST':
+        form = VendorForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Vendor added.')
+            return redirect('vendors')
+    else:
+        form = VendorForm()
+    return render(request, 'accounts/vendor_create.html', {'form': form})
+
+
+    path('vendor_create', views.vendor_create, name='vendor_create'),
