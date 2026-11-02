@@ -106,3 +106,25 @@ def proof_create(request, pk):
     else:
         form = ResolutionProofForm()
     return render(request, 'enforcement/proof_create.html', {'form': form, 'investigation': inv})
+
+@role_required('authority')
+def proof_update(request, pk):
+    proof = get_object_or_404(ResolutionProof, pk=pk)
+    if request.method == 'POST':
+        form = ResolutionProofForm(request.POST, request.FILES, instance=proof)
+        if form.is_valid():
+            form.save()
+            return redirect('investigation_detail', pk=proof.investigation.pk)
+    else:
+        form = ResolutionProofForm(instance=proof)
+    return render(request, 'enforcement/proof_update.html', {'form': form, 'proof': proof})
+
+
+@role_required('authority')
+def proof_delete(request, pk):
+    proof = get_object_or_404(ResolutionProof, pk=pk)
+    inv_pk = proof.investigation.pk
+    if request.method == 'POST':
+        proof.delete()
+        return redirect('investigation_detail', pk=inv_pk)
+    return render(request, 'enforcement/proof_delete.html', {'proof': proof})
