@@ -10,5 +10,7 @@ urlpatterns = [
     path('vendor_create', views.vendor_create, name='vendor_create'),
     path('vendor/<int:pk>/update', views.vendor_update, name='vendor_update'),
     path('vendor/<int:pk>/delete', views.vendor_delete, name='vendor_delete'),
+    path('profile', views.profile, name='profile'),
+    path('profile/update', views.profile_update, name='profile_update'),
 
 ]

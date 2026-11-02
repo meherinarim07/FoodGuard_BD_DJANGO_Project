@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Vendor
-from .forms import RegisterForm,VendorForm
+from .forms import RegisterForm,VendorForm,ProfileForm
 from .decorators import role_required
 
 
@@ -90,5 +90,26 @@ def vendor_delete(request, pk):
             messages.error(request, 'This vendor has reports, so it cannot be deleted.')
         return redirect('vendors')
     return render(request, 'accounts/vendor_delete.html', {'vendor': vendor})
+
+@login_required
+def profile(request):
+    p = request.user.userprofile
+    p.calculate_trust_score()
+    history = p.get_report_history()
+    return render(request, 'accounts/profile.html', {'profile': p, 'history': history})
+
+
+@login_required
+def profile_update(request):
+    p = request.user.userprofile
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, instance=p)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated.')
+            return redirect('profile')
+    else:
+        form = ProfileForm(instance=p)
+    return render(request, 'accounts/profile_update.html', {'form': form})
 
 

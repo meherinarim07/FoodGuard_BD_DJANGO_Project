@@ -18,3 +18,8 @@ class VendorForm(forms.ModelForm):
     class Meta:
         model = Vendor
         exclude = ['risk_score']
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['phone', 'area']

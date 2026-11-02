@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}My Profile | {{ block.super }}{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="fg-card card-pad text-center">
+            <div class="stat-icon mx-auto mb-3" style="width:80px;height:80px;font-size:2.4rem"><i class="bi bi-person"></i></div>
+            <h4 class="mb-1">{{ user.username }}</h4>
+            <span class="pill pill-role">{{ profile.get_role_display }}</span>
+            <hr>
+            {% if profile.role == 'citizen' %}
+            <p class="mb-1 text-muted small">Trust score</p>
+            <h2 class="mb-1">{{ profile.trust_score|floatformat:0 }}<small class="text-muted fs-6">/100</small></h2>
+            <div class="risk mx-auto mb-3" style="max-width:200px"><div style="width: {{ profile.trust_score|floatformat:0 }}%"></div></div>
+            {% endif %}
+            <p class="small text-start mb-1"><i class="bi bi-envelope"></i> {{ user.email|default:"-" }}</p>
+            <p class="small text-start mb-1"><i class="bi bi-telephone"></i> {{ profile.phone|default:"-" }}</p>
+            <p class="small text-start mb-1"><i class="bi bi-geo-alt"></i> {{ profile.area|default:"-" }}</p>
+            <p class="small text-start mb-3"><i class="bi bi-calendar3"></i> Joined {{ profile.join_date }}</p>
+            <a href="{% url 'profile_update' %}" class="btn btn-outline-fg btn-sm">Edit profile</a>
+        </div>
+    </div>
+    {% if profile.role == 'citizen' %}
+    <div class="col-lg-8">
+        <h4 class="page-title">My report history</h4>
+        <p class="page-sub">Verified reports raise your trust score, rejected reports lower it.</p>
+        <div class="fg-card">
+            <table class="table fg-table">
+                <thead><tr><th>Food item</th><th>Vendor</th><th>Status</th><th>Date</th></tr></thead>
+                <tbody>
+                {% for r in history %}
+                <tr>
+                    <td><a href="{% url 'report_detail' r.pk %}" class="text-decoration-none fw-semibold">{{ r.food_item }}</a></td>
+                    <td>{{ r.vendor.shop_name }}</td>
+                    <td><span class="pill pill-{{ r.status }}">{{ r.get_status_display }}</span></td>
+                    <td>{{ r.created_at|date:"d M Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-muted py-4">You have not sent any report yet.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
