@@ -148,3 +148,13 @@ def evidence_delete(request, pk):
         evidence.delete()
         return redirect('report_detail', pk=report_pk)
     return render(request, 'reports/evidence_delete.html', {'evidence': evidence})
+
+def awareness(request):
+    p_list = AwarenessPost.objects.all().order_by('-published_at')
+    return render(request, 'reports/awareness.html', {'posts': p_list})
+
+
+def post_detail(request, pk):
+    post = get_object_or_404(AwarenessPost, pk=pk)
+    post.increment_views()
+    return render(request, 'reports/post_detail.html', {'post': post})

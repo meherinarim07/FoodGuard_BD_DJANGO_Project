@@ -12,4 +12,8 @@ urlpatterns = [
     path('report/<int:pk>/evidence', views.evidence_create, name='evidence_create'),
     path('evidence/<int:pk>/update', views.evidence_update, name='evidence_update'),
     path('evidence/<int:pk>/delete', views.evidence_delete, name='evidence_delete'),
+
+    path('awareness', views.awareness, name='awareness'),
+    path('post/<int:pk>', views.post_detail, name='post_detail'),
+
 ]

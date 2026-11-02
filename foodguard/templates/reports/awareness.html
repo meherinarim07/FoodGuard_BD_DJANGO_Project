@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Awareness | {{ block.super }}{% endblock %}
+{% block banner %}
+<section class="page-banner"><div class="fg-container"><div class="crumb"><a href="{% url 'home' %}">Home</a> / Food safety awareness</div><h1>Food safety awareness</h1><p>Tips and notices to keep your family safe.</p></div></section>
+{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-end flex-wrap">
+    <div></div>
+    {% if user.is_authenticated %}<a href="{% url 'post_create' %}" class="btn btn-fg mb-3"><i class="bi bi-plus-lg"></i> New post</a>{% endif %}
+</div>
+<div class="row g-3">
+    {% for p in posts %}
+    <div class="col-md-6 col-lg-4">
+        <div class="fg-card h-100">
+            {% if p.image %}<img src="{{ p.image.url }}" class="post-img" alt="{{ p.title }}">
+            {% else %}<div class="post-img-placeholder"><i class="bi bi-egg-fried"></i></div>{% endif %}
+            <div class="card-pad">
+                <span class="pill pill-role mb-2">{{ p.category }}</span>
+                <h5>{{ p.title }}</h5>
+                <p class="text-muted small">{{ p.content|truncatechars:110 }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{% url 'post_detail' p.pk %}" class="btn btn-outline-fg btn-sm">Read more</a>
+                    <span class="text-muted small"><i class="bi bi-eye"></i> {{ p.views_count }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-muted">No posts yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}
