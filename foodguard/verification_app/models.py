@@ -46,4 +46,22 @@ class Verification(models.Model):
 
 
 class FraudFlag(models.Model):
-    pass
+    SUSPICION_CHOICES = [
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+    ]
+    STATUS_CHOICES = [
+        ('open', 'Open'),
+        ('confirmed_fraud', 'Confirmed fraud'),
+        ('dismissed', 'Dismissed'),
+    ]
+    report = models.ForeignKey(FoodReport, on_delete=models.CASCADE)
+    reason = models.CharField(max_length=200)
+    suspicion_level = models.CharField(max_length=20, choices=SUSPICION_CHOICES, default='low')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+    def __str__(self):
+        return f"Flag on report {self.report_id} ({self.suspicion_level})"
