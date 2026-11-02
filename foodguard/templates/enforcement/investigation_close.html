@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Close investigation | {{ block.super }}{% endblock %}
+{% block content %}
+<div class="form-card fg-card card-pad">
+    <h3 class="page-title"><i class="bi bi-check2-circle"></i> Close investigation</h3>
+    <p>Close investigation <b>#{{ investigation.id }}</b>? The report <b>{{ investigation.report }}</b> will be marked as resolved.</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Yes, close it</button>
+        <a href="{% url 'investigation_detail' investigation.pk %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

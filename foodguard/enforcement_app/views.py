@@ -82,3 +82,12 @@ def investigation_update(request, pk):
     else:
         form = InvestigationForm(instance=inv)
     return render(request, 'enforcement/investigation_update.html', {'form': form, 'investigation': inv})
+
+@role_required('authority')
+def investigation_close(request, pk):
+    inv = get_object_or_404(Investigation, pk=pk)
+    if request.method == 'POST':
+        inv.close()
+        messages.success(request, 'Investigation closed and the report is marked resolved.')
+        return redirect('investigation_detail', pk=pk)
+    return render(request, 'enforcement/investigation_close.html', {'investigation': inv})
