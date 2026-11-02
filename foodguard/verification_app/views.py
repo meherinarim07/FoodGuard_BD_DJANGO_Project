@@ -49,3 +49,34 @@ def verification_create(request, pk):
         form = VerificationForm()
     return render(request, 'verification/verification_create.html', {
         'form': form, 'report': report, 'evidence_list': report.evidence_set.all()})
+
+
+@role_required('verifier')
+def verification_update(request, pk):
+    v = get_object_or_404(Verification, pk=pk, verifier=request.user)
+    if v.report.status not in ['pending', 'under_review']:
+        messages.error(request, 'Opinions cannot be changed after the report is verified or closed.')
+        return redirect('verifications')
+    if request.method == 'POST':
+        form = VerificationForm(request.POST, instance=v)
+        if form.is_valid():
+            form.save()
+            v.report.update_status()
+            return redirect('verifications')
+    else:
+        form = VerificationForm(instance=v)
+    return render(request, 'verification/verification_update.html', {'form': form, 'verification': v})
+
+
+@role_required('verifier')
+def verification_delete(request, pk):
+    v = get_object_or_404(Verification, pk=pk, verifier=request.user)
+    if v.report.status not in ['pending', 'under_review']:
+        messages.error(request, 'Opinions cannot be deleted after the report is verified or closed.')
+        return redirect('verifications')
+    if request.method == 'POST':
+        report = v.report
+        v.delete()
+        report.update_status()
+        return redirect('verifications')
+    return render(request, 'verification/verification_delete.html', {'verification': v})
