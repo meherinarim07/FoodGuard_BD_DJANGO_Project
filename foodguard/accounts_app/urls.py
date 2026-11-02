@@ -8,5 +8,7 @@ urlpatterns = [
     path('vendors', views.vendors, name='vendors'),
     path('vendor/<int:pk>', views.vendor_detail, name='vendor_detail'),
     path('vendor_create', views.vendor_create, name='vendor_create'),
+    path('vendor/<int:pk>/update', views.vendor_update, name='vendor_update'),
+    path('vendor/<int:pk>/delete', views.vendor_delete, name='vendor_delete'),
 
 ]

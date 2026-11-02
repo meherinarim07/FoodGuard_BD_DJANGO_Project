@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Edit vendor | {{ block.super }}{% endblock %}
+{% block content %}
+<div class="form-card fg-card card-pad">
+    <h3 class="page-title"><i class="bi bi-pencil-square"></i> Edit vendor</h3>
+    <p class="page-sub">Update the shop details.</p>
+    <form method="post">
+        {% csrf_token %}
+        {% include 'partials/form_fields.html' %}
+        <button type="submit" class="btn btn-fg">Submit</button>
+        <a href="{% url 'vendors' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

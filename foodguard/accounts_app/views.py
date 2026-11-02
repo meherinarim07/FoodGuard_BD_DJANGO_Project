@@ -64,5 +64,31 @@ def vendor_create(request):
         form = VendorForm()
     return render(request, 'accounts/vendor_create.html', {'form': form})
 
+@role_required('authority')
+def vendor_update(request, pk):
+    vendor = get_object_or_404(Vendor, pk=pk)
+    if request.method == 'POST':
+        form = VendorForm(request.POST, instance=vendor)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Vendor updated.')
+            return redirect('vendors')
+    else:
+        form = VendorForm(instance=vendor)
+    return render(request, 'accounts/vendor_update.html', {'form': form})
 
-    path('vendor_create', views.vendor_create, name='vendor_create'),
+
+@role_required('authority')
+def vendor_delete(request, pk):
+    vendor = get_object_or_404(Vendor, pk=pk)
+    if request.method == 'POST':
+        try:
+            vendor.delete()
+            messages.success(request, 'Vendor deleted.')
+        except ProtectedError:
+            # reports still point to this vendor (on_delete=PROTECT), so it cannot be deleted
+            messages.error(request, 'This vendor has reports, so it cannot be deleted.')
+        return redirect('vendors')
+    return render(request, 'accounts/vendor_delete.html', {'vendor': vendor})
+
+
