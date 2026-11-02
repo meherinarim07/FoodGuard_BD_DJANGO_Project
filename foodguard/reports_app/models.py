@@ -51,5 +51,50 @@ class FoodReport(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
 
+
+    def submit(self):
+        # called once when a citizen sends a new report.
+        # The report starts as pending and does not change the vendor risk yet.
+        from verification_app.models import FraudFlag
+        self.status = 'pending'
+        self.save()
+        FraudFlag.evaluate(self)
+
+    def update_status(self, new_status=None):
+        # with a value: set it directly (authority use)
+        # without a value: decide from the verifier votes (2 approvals = verified, 2 rejections = rejected)
+        if new_status:
+            self.status = new_status
+        else:
+            approved = self.verification_set.filter(verdict='approved').count()
+            rejected = self.verification_set.filter(verdict='rejected').count()
+            if approved >= 2:
+                self.status = 'verified'
+            elif rejected >= 2:
+                self.status = 'rejected'
+            elif self.verification_set.exists():
+                self.status = 'under_review'
+            else:
+                self.status = 'pending'
+        self.save()
+        self.reporter.userprofile.calculate_trust_score()
+        self.vendor.calculate_risk_score()
+        self.vendor.check_alert()
+
+    def get_chain(self):
+        # the full life of a report: report -> verifications -> investigation
+        try:
+            investigation = self.investigation
+        except Exception:
+            investigation = None
+        return {
+            'report': self,
+            'verifications': self.verification_set.all(),
+            'investigation': investigation,
+        }
+
     def __str__(self):
         return f"{self.food_item} @ {self.vendor.shop_name}"
+
+
+
