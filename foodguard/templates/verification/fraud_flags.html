@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Fraud flags | {{ block.super }}{% endblock %}
+{% block banner %}
+<section class="page-banner"><div class="fg-container"><div class="crumb"><a href="{% url 'home' %}">Home</a> / Fraud flags</div><h1>Fraud flags</h1><p>Raised automatically by the system when a report looks suspicious.</p></div></section>
+{% endblock %}
+{% block content %}
+<div class="fg-card">
+    <table class="table fg-table">
+        <thead><tr><th>ID</th><th>Report</th><th>Reason</th><th>Suspicion</th><th>Status</th><th>Date</th><th>Functions</th></tr></thead>
+        <tbody>
+        {% for f in flags %}
+        <tr>
+            <th scope="row">{{ f.id }}</th>
+            <td><a href="{% url 'report_detail' f.report.pk %}" class="text-decoration-none">{{ f.report.food_item }}</a></td>
+            <td>{{ f.reason }}</td>
+            <td><span class="pill pill-{{ f.suspicion_level }}">{{ f.get_suspicion_level_display }}</span></td>
+            <td><span class="pill pill-{{ f.status }}">{{ f.get_status_display }}</span></td>
+            <td>{{ f.created_at|date:"d M Y" }}</td>
+            <td>{% if f.status == 'open' %}<a href="{% url 'fraudflag_resolve' f.pk %}" class="btn btn-fg btn-sm">Resolve</a>{% endif %}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-center text-muted py-4">No fraud flags. All clear.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

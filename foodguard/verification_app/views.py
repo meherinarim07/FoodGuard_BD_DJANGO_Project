@@ -80,3 +80,21 @@ def verification_delete(request, pk):
         report.update_status()
         return redirect('verifications')
     return render(request, 'verification/verification_delete.html', {'verification': v})
+
+
+@role_required('authority')
+def fraud_flags(request):
+    f_list = FraudFlag.objects.all().order_by('-created_at')
+    return render(request, 'verification/fraud_flags.html', {'flags': f_list})
+
+
+@role_required('authority')
+def fraudflag_resolve(request, pk):
+    flag = get_object_or_404(FraudFlag, pk=pk)
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        if new_status in ['confirmed_fraud', 'dismissed']:
+            flag.resolve(new_status)
+            messages.success(request, 'Fraud flag resolved.')
+        return redirect('fraud_flags')
+    return render(request, 'verification/fraudflag_resolve.html', {'flag': flag})

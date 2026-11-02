@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Resolve fraud flag | {{ block.super }}{% endblock %}
+{% block content %}
+<div class="form-card fg-card card-pad">
+    <h3 class="page-title"><i class="bi bi-shield-exclamation"></i> Resolve fraud flag</h3>
+    <p class="page-sub">Report: <b>{{ flag.report }}</b></p>
+    <p><b>Reason:</b> {{ flag.reason }} <span class="pill pill-{{ flag.suspicion_level }} ms-1">{{ flag.get_suspicion_level_display }}</span></p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" name="status" value="confirmed_fraud" class="btn btn-danger">Confirm fraud (rejects the flagged report)</button>
+        <button type="submit" name="status" value="dismissed" class="btn btn-success">Dismiss</button>
+        {% if 'coordinated' in flag.reason %}<p class="small text-muted mt-3 mb-0">Confirming a coordinated attack rejects every unchecked report this vendor received in the last 24 hours. Dismissing it lets area alerts start again.</p>{% endif %}
+        <a href="{% url 'fraud_flags' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
