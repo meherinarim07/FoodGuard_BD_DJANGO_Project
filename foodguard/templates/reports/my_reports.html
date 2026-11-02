@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}My Reports | {{ block.super }}{% endblock %}
+{% block banner %}
+<section class="page-banner"><div class="fg-container"><div class="crumb"><a href="{% url 'home' %}">Home</a> / My reports</div><h1>My reports</h1><p>Reports you have sent.</p></div></section>
+{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-end flex-wrap">
+    <div></div>
+    <a href="{% url 'report_create' %}" class="btn btn-fg mb-3"><i class="bi bi-plus-lg"></i> New report</a>
+</div>
+<div class="fg-card">
+    <table class="table fg-table">
+        <thead><tr><th>ID</th><th>Food item</th><th>Vendor</th><th>Severity</th><th>Status</th><th>Functions</th></tr></thead>
+        <tbody>
+        {% for r in reports %}
+        <tr>
+            <th scope="row">{{ r.id }}</th>
+            <td class="fw-semibold">{{ r.food_item }}</td>
+            <td>{{ r.vendor.shop_name }}</td>
+            <td><span class="pill pill-{{ r.severity }}">{{ r.get_severity_display }}</span></td>
+            <td><span class="pill pill-{{ r.status }}">{{ r.get_status_display }}</span></td>
+            <td>
+                <a href="{% url 'report_detail' r.pk %}" class="btn btn-outline-fg btn-sm">View</a>
+                {% if r.status == 'pending' %}
+                <a href="{% url 'report_update' r.pk %}" class="btn btn-primary btn-sm">Edit</a>
+                <a href="{% url 'report_delete' r.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-muted py-4">You have not sent any report yet.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

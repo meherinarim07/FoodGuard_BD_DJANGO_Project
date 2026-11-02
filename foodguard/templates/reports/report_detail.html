@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}Report {{ report.id }} | {{ block.super }}{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="fg-card card-pad mb-4">
+            <div class="d-flex justify-content-between flex-wrap gap-2">
+                <div>
+                    <h2 class="page-title">{{ report.food_item }}</h2>
+                    <p class="text-muted mb-0"><i class="bi bi-shop"></i>
+                        <a href="{% url 'vendor_detail' report.vendor.pk %}" class="text-decoration-none">{{ report.vendor.shop_name }}</a>
+                        &middot; {{ report.vendor.area }}</p>
+                </div>
+                <div class="text-end">
+                    <span class="pill pill-{{ report.severity }}">{{ report.get_severity_display }}</span>
+                    <span class="pill pill-{{ report.status }}">{{ report.get_status_display }}</span>
+                </div>
+            </div>
+            <hr>
+            <p>{{ report.description|linebreaksbr }}</p>
+            <p class="text-muted small mb-0">Reported by <b>{{ report.reporter.username }}</b> on {{ report.created_at|date:"d M Y, H:i" }}</p>
+        </div>
+
+        <div class="fg-card mb-4">
+            <div class="card-title-bar">
+                <span><i class="bi bi-images"></i> Evidence</span>
+                {% if report.reporter == user %}
+                <a href="{% url 'evidence_create' report.pk %}" class="btn btn-outline-fg btn-sm">Add evidence</a>
+                {% endif %}
+            </div>
+            <div class="card-pad">
+                <div class="row g-3">
+                    {% for e in evidence_list %}
+                    <div class="col-md-4">
+                        <img src="{{ e.image.url }}" class="evidence-img" alt="Evidence">
+                        <div class="small mt-1">{{ e.caption|default:"No caption" }}</div>
+                        {% if report.reporter == user %}
+                        <a href="{% url 'evidence_update' e.pk %}" class="small">Edit</a> &middot;
+                        <a href="{% url 'evidence_delete' e.pk %}" class="small text-danger">Delete</a>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <p class="text-muted mb-0">No evidence uploaded.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="fg-card">
+            <div class="card-title-bar"><span><i class="bi bi-person-check"></i> Verifier opinions</span></div>
+            <table class="table fg-table">
+                <thead><tr><th>Verifier</th><th>Verdict</th><th>Confidence</th><th>Evidence quality</th><th>Comment</th></tr></thead>
+                <tbody>
+                {% for v in verifications %}
+                <tr>
+                    <td>{{ v.verifier.username }}</td>
+                    <td><span class="pill pill-{{ v.verdict }}">{{ v.get_verdict_display }}</span></td>
+                    <td>{{ v.confidence }}/5</td>
+                    <td>{{ v.evidence_quality }}/5</td>
+                    <td>{{ v.comment|default:"-" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center text-muted py-3">Waiting for verifiers.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="fg-card card-pad mb-4">
+            <h5 class="mb-3">Report journey</h5>
+            <ul class="timeline">
+                <li class="done"><span class="dot"></span><b>Submitted</b><div class="small text-muted">{{ report.created_at|date:"d M Y" }}</div></li>
+                <li class="{% if verifications %}done{% endif %}"><span class="dot"></span><b>Verification</b><div class="small text-muted">{{ verifications|length }} opinion{{ verifications|length|pluralize }}</div></li>
+                <li class="{% if investigation %}done{% endif %}"><span class="dot"></span><b>Investigation</b>
+                    <div class="small text-muted">{% if investigation %}<a href="{% if user.userprofile.role == 'authority' %}{% url 'investigation_detail' investigation.pk %}{% else %}#{% endif %}">{{ investigation.get_status_display }}</a>{% else %}Not started{% endif %}</div></li>
+                <li class="{% if report.status == 'resolved' %}done{% endif %}"><span class="dot"></span><b>Resolved</b></li>
+            </ul>
+        </div>
+
+        {% if user.is_authenticated %}
+        <div class="fg-card card-pad">
+            <h5 class="mb-3">Actions</h5>
+            <div class="d-grid gap-2">
+                {% if report.reporter == user and report.status == 'pending' %}
+                <a href="{% url 'report_update' report.pk %}" class="btn btn-primary">Edit report</a>
+                <a href="{% url 'report_delete' report.pk %}" class="btn btn-danger">Delete report</a>
+                {% endif %}
+                {% if user.userprofile.role == 'verifier' %}
+                    {% if report.status == 'pending' or report.status == 'under_review' %}
+                    <a href="{% url 'verification_create' report.pk %}" class="btn btn-fg">Verify this report</a>
+                    {% endif %}
+                {% endif %}
+                {% if user.userprofile.role == 'authority' and report.status == 'verified' and not investigation %}
+                <a href="{% url 'investigation_create' report.pk %}" class="btn btn-warning">Open investigation</a>
+                {% endif %}
+                <a href="{% url 'reports' %}" class="btn btn-outline-secondary">Back to reports</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

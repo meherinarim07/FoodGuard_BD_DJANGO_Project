@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Reports | {{ block.super }}{% endblock %}
+{% block banner %}
+<section class="page-banner"><div class="fg-container"><div class="crumb"><a href="{% url 'home' %}">Home</a> / Food reports</div><h1>Food reports</h1><p>All complaints sent by citizens.</p></div></section>
+{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-end flex-wrap">
+    <div></div>
+    {% if user.userprofile.role == 'citizen' %}<a href="{% url 'report_create' %}" class="btn btn-fg mb-3"><i class="bi bi-plus-lg"></i> New report</a>{% endif %}
+</div>
+
+<form method="get" class="fg-card card-pad mb-3">
+    <div class="row g-2 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label small fw-semibold">Status</label>
+            <select name="status" class="form-select">
+                <option value="">All</option>
+                {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label small fw-semibold">Severity</label>
+            <select name="severity" class="form-select">
+                <option value="">All</option>
+                {% for value, label in severity_choices %}
+                <option value="{{ value }}" {% if severity == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-fg">Filter</button>
+            <a href="{% url 'reports' %}" class="btn btn-outline-secondary">Reset</a>
+        </div>
+    </div>
+</form>
+
+<div class="fg-card">
+    <table class="table fg-table">
+        <thead><tr><th>ID</th><th>Food item</th><th>Vendor</th><th>Area</th><th>Severity</th><th>Status</th><th>Date</th><th>Functions</th></tr></thead>
+        <tbody>
+        {% for r in reports %}
+        <tr>
+            <th scope="row">{{ r.id }}</th>
+            <td class="fw-semibold">{{ r.food_item }}</td>
+            <td>{{ r.vendor.shop_name }}</td>
+            <td>{{ r.vendor.area }}</td>
+            <td><span class="pill pill-{{ r.severity }}">{{ r.get_severity_display }}</span></td>
+            <td><span class="pill pill-{{ r.status }}">{{ r.get_status_display }}</span></td>
+            <td>{{ r.created_at|date:"d M Y" }}</td>
+            <td><a href="{% url 'report_detail' r.pk %}" class="btn btn-outline-fg btn-sm">View</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8" class="text-center text-muted py-4">No reports found.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
