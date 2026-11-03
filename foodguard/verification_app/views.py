@@ -41,8 +41,13 @@ def verification_create(request, pk):
             v = form.save(commit=False)
             v.report = report
             v.verifier = request.user
-            v.save()
-            report.update_status()
+            if v.verdict == 'approved':
+                v.approve()
+            elif v.verdict == 'rejected':
+                v.reject()
+            else:
+                v.save()
+                report.update_status()
             messages.success(request, 'Your verification was saved.')
             return redirect('verification_queue')
     else:
@@ -60,8 +65,14 @@ def verification_update(request, pk):
     if request.method == 'POST':
         form = VerificationForm(request.POST, instance=v)
         if form.is_valid():
-            form.save()
-            v.report.update_status()
+            v = form.save()
+            if v.verdict == 'approved':
+                v.approve()
+            elif v.verdict == 'rejected':
+                v.reject()
+            else:
+                v.report.update_status()
+
             return redirect('verifications')
     else:
         form = VerificationForm(instance=v)
