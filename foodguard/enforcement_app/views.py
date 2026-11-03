@@ -93,6 +93,14 @@ def investigation_close(request, pk):
     return render(request, 'enforcement/investigation_close.html', {'investigation': inv})
 
 @role_required('authority')
+def investigation_reopen(request, pk):
+    inv = get_object_or_404(Investigation, pk=pk)
+    if request.method == 'POST' and inv.status == 'closed':
+        inv.open()
+        messages.success(request, 'Investigation reopened.')
+    return redirect('investigation_detail', pk=pk)
+
+@role_required('authority')
 def proof_create(request, pk):
     inv = get_object_or_404(Investigation, pk=pk)
     if request.method == 'POST':

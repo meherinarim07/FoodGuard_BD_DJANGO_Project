@@ -50,6 +50,8 @@ class Investigation(models.Model):
         self.status = 'open'
         self.closed_at = None
         self.save()
+        if self.report.status == 'resolved':
+            self.report.update_status('verified')
 
     def close(self):
         self.status = 'closed'

@@ -53,10 +53,19 @@
             <h5 class="mb-3">Actions</h5>
             <div class="d-grid gap-2">
                 <a href="{% url 'investigation_update' investigation.pk %}" class="btn btn-primary">Update investigation</a>
-                {% if investigation.status != 'closed' %}
-                <a href="{% url 'investigation_close' investigation.pk %}" class="btn btn-success">Close investigation</a>
-                {% endif %}
-                <a href="{% url 'investigations' %}" class="btn btn-outline-secondary">Back</a>
+               {% if investigation.status != 'closed' %}
+<a href="{% url 'investigation_close' investigation.pk %}" class="btn btn-success">Close investigation</a>
+{% endif %}
+
+{% if investigation.status == 'closed' %}
+<form method="post" action="{% url 'investigation_reopen' investigation.pk %}"
+      onsubmit="return confirm('Reopen this investigation? The report will go back to verified.')">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-warning w-100">Reopen investigation</button>
+</form>
+{% endif %}
+
+<a href="{% url 'investigations' %}" class="btn btn-outline-secondary">Back</a>
             </div>
         </div>
     </div>

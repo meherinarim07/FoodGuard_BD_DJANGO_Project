@@ -10,6 +10,8 @@ urlpatterns = [
     path('report/<int:pk>/investigate', views.investigation_create, name='investigation_create'),
     path('investigation/<int:pk>/update', views.investigation_update, name='investigation_update'),
     path('investigation/<int:pk>/close', views.investigation_close, name='investigation_close'),
+    path('investigation/<int:pk>/reopen', views.investigation_reopen, name='investigation_reopen'),
+
     path('investigation/<int:pk>/proof', views.proof_create, name='proof_create'),
     path('proof/<int:pk>/update', views.proof_update, name='proof_update'),
     path('proof/<int:pk>/delete', views.proof_delete, name='proof_delete'),
